@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Futurologia AI ⚽</title>
+  <style>
+    /* TailwindCSS simplificado */
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f3f4f6;
+      margin: 0;
+      padding: 0;
+    }
+    .container {
+      max-width: 800px;
+      margin: 2rem auto;
+      padding: 1.5rem;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    h1 {
+      color: #2563eb;
+      text-align: center;
+      font-size: 2rem;
+      margin-bottom: 1.5rem;
+    }
+    input, button {
+      width: 100%;
+      padding: 0.75rem;
+      border-radius: 8px;
+      border: 1px solid #d1d5db;
+      font-size: 1rem;
+    }
+    button {
+      background-color: #2563eb;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+      margin-top: 0.5rem;
+      transition: background-color 0.3s;
+    }
+    button:hover {
+      background-color: #1d4ed8;
+    }
+    button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+    .loading {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      border: 3px solid rgba(255,255,255,0.3);
+      border-radius: 50%;
+      border-top-color: white;
+      animation: spin 1s ease-in-out infinite;
+      margin-right: 8px;
+    }
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 1.5rem;
+    }
+    th, td {
+      padding: 0.75rem;
+      text-align: left;
+      border-bottom: 1px solid #e5e7eb;
+    }
+    th {
+      background-color: #f9fafb;
+      font-weight: bold;
+    }
+    .report {
+      background-color: #f8fafc;
+      padding: 1rem;
+      border-radius: 8px;
+      margin: 1rem 0;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>⚽ Futurologia AI</h1>
+    
+    <input 
+      type="text" 
+      id="matchInput" 
+      placeholder="Ex: Flamengo x Palmeiras"
+    >
+    <button id="analyzeButton">Analisar Partida</button>
+    
+    <div id="resultContainer" style="display: none;">
+      <h2>📊 Análise da Partida</h2>
+      <div id="teamStats" class="grid"></div>
+      <div id="aiReport" class="report"></div>
+      <table id="predictionTable">
+        <thead>
+          <tr>
+            <th>Recomendação</th>
+            <th>Detalhes</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </div>
+
+  <script>
+    document.getElementById('analyzeButton').addEventListener('click', async () => {
+      const match = document.getElementById('matchInput').value.trim();
+      if (!match) return alert('Digite um confronto válido!');
+      
+      const button = document.getElementById('analyzeButton');
+      button.disabled = true;
+      button.innerHTML = '<span class="loading"></span> Analisando...';
+      
+      try {
+        // Simulação de análise (substitua pela sua API real)
+        const analysis = await simulateAnalysis(match);
+        displayResults(analysis);
+      } catch (error) {
+        console.error(error);
+        alert('Erro ao analisar. Tente novamente!');
+      } finally {
+        button.disabled = false;
+        button.textContent = 'Analisar Partida';
+      }
+    });
+
+    // Função de simulação (substitua por chamadas reais à API)
+    async function simulateAnalysis(match) {
+      return new Promise((resolve) => {
+        setTimeout(() => {
+          const [team1, team2] = match.split(/ x | vs /i);
+          resolve({
+            prediction: {
+              winner: `${team1} (72% de chance)`,
+              goals: "Over 2.5 gols (85%)",
+              cards: "3.5 cartões (média)",
+              corners: "5.7 escanteios",
+              firstScorer: `${team1} (60% chance)`
+            },
+            report: `🔍 Análise gerada por IA:\n\n${team1} vem de 3 vitórias consecutivas e tem melhor defesa. ${team2} tem ataque forte mas sofre com bolas paradas. Expectativa de jogo aberto com mais de 2.5 gols.`,
+            stats: {
+              team1: { posicao: 1, gols: 28, xG: 2.1 },
+              team2: { posicao: 3, gols: 25, xG: 1.8 }
+            }
+          });
+        }, 1500); // Simula delay de API
+      });
+    }
+
+    function displayResults(data) {
+      const container = document.getElementById('resultContainer');
+      const tableBody = document.querySelector('#predictionTable tbody');
+      const reportDiv = document.getElementById('aiReport');
+      const statsDiv = document.getElementById('teamStats');
+      
+      // Preenche tabela
+      tableBody.innerHTML = '';
+      Object.entries(data.prediction).forEach(([key, value]) => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td>${formatKey(key)}</td>
+          <td>${value}</td>
+        `;
+        tableBody.appendChild(row);
+      });
+      
+      // Preenche relatório
+      reportDiv.textContent = data.report;
+      
+      // Preenche estatísticas (simplificado)
+      statsDiv.innerHTML = `
+        <div>
+          <h3>${Object.keys(data.stats)[0]}</h3>
+          <p>Posição: ${data.stats.team1.posicao}º</p>
+          <p>Gols: ${data.stats.team1.gols}</p>
+        </div>
+        <div>
+          <h3>${Object.keys(data.stats)[1]}</h3>
+          <p>Posição: ${data.stats.team2.posicao}º</p>
+          <p>Gols: ${data.stats.team2.gols}</p>
+        </div>
+      `;
+      
+      container.style.display = 'block';
+    }
+
+    function formatKey(key) {
+      return key
+        .replace(/([A-Z])/g, ' $1')
+        .replace(/^./, str => str.toUpperCase());
+    }
+  </script>
+</body>
+</html>
